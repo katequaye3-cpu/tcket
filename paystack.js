@@ -26,28 +26,31 @@ fetch(url, {
     if (data.status === true) {//Take action
       const paymentData = data.data;//Assigning data to local scoped variable
       const time = new Date(paymentData.paidAt)
-      const secrekey = "Made_By_BM";
-      const encryptedCode = CryptoJS.AES.encrypt(key, secrekey).toString()
-      const info = {
-        key: ticketCode,
-        name: paymentData.customer.first_name + ' ' + paymentData.customer.last_name,
-        number: paymentData.customer.phone,
-        email: paymentData.customer.email
-      };
-      const key = JSON.stringify(info) ;
-      const DBdata = {//Database Declaration
-        code: code = info
-      }
       function generateticketCode(){//Generate Unique Ticket Code
-        ticketCode = 'BM - ' + (paymentData.id+paymentData.reference).toString().slice(-6);
+        const ticketCode = 'BM - ' + (parseFloat(paymentData.id+paymentData.reference)).toString().slice(-6);
+       ticketCode;
+        const path =  (paymentData.customer.first_name + ' ' + paymentData.customer.last_name) + " 's ticket"
         para.textContent = ticketCode;
-        addDataToDatabase((paymentData.firstChild + ' ' + paymentData.last_name + "'s tickets") , DBdata);
+        addDataToDatabase(path , DBdata);
         //Testing variables
         console.log(info.key)
         console.log(encryptedCode);
         console.log(CryptoJS.AES.decrypt(encryptedCode,secrekey).toString(CryptoJS.enc.Utf8));
         return encryptedCode;
       }
+       const info = {
+        key: 'BM - ' + (parseFloat(paymentData.id+paymentData.reference)).toString().slice(-6),
+        name: paymentData.customer.first_name + ' ' + paymentData.customer.last_name,
+        number: paymentData.customer.phone,
+        email: paymentData.customer.email
+      };
+      const DBdata = {//Database Declaration
+        code: code = info
+      }
+      const secrekey = "Made_By_BM";
+      const key = JSON.stringify(info) ;
+      const encryptedCode = CryptoJS.AES.encrypt(key, secrekey).toString()
+     
       //Generate QR Code
       function generateQR (arg) {
         while(qr.firstChild){
@@ -103,10 +106,10 @@ function addDataToDatabase(path, data) {
       alert('Data already exists!');
     } else {
       set(dbRef, data);
-      alert('encrypted added to database')
+      alert('data added to database')
     }
   }).catch((error) => {
-    console.error('Error checking data:', error);
+    alert('Error checking data:', error.message);
   });
 }
 
