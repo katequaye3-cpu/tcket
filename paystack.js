@@ -29,7 +29,7 @@ fetch(url, {
       function generateticketCode(){//Generate Unique Ticket Code
         const ticketCode = 'BM - ' + (parseFloat(paymentData.id+paymentData.reference)).toString().slice(-6);
        ticketCode;
-        const path =  (paymentData.customer.first_name + ' ' + paymentData.customer.last_name) + " 's ticket"
+        const path =  (paymentData.customer.first_name + ' ' + paymentData.customer.last_name) + "'s ticket ID " + ((parseFloat(paymentData.id+paymentData.reference)).toString().slice(-6))
         para.textContent = ticketCode;
         addDataToDatabase(path , DBdata);
         //Testing variables
