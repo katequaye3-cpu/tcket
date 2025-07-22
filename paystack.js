@@ -27,7 +27,6 @@ fetch(url, {
       const paymentData = data.data;//Assigning data to local scoped variable
       const time = new Date(paymentData.paidAt)
       const secrekey = "Made_By_BM";
-      const key = JSON.stringify(info) ;
       const encryptedCode = CryptoJS.AES.encrypt(key, secrekey).toString()
       const info = {
         key: ticketCode,
@@ -35,6 +34,7 @@ fetch(url, {
         number: paymentData.customer.phone,
         email: paymentData.customer.email
       };
+      const key = JSON.stringify(info) ;
       const DBdata = {//Database Declaration
         code: code = info
       }
