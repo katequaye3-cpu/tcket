@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tcket_Generator</title>
+    <link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+    <div class="control_panel">
+        <button id="generate-ticket">bv</button>
+        <div class="heading">
+            <h1>Get Your <br> Blizz Media <br> Event Tickets</h1>
+        </div>
+        <input type="text" name="ad" id="ref">
+    </div>
+    <div class="colorbox"></div>
+    <div class="preview">
+        <div class="ticketBox">
+            <div class="qrSpace">
+                <div id="qrcode"></div>
+                <div id="type">
+  
+            </div>
+        
+    </div>
+        <div class="Info_Space">
+                <p id="code">Code</p>
+                <h2 style="font-family: 'Radjhani_L';" id="name">Holder Name</h2>
+                <div style="font-family: 'Courier New', Courier, monospace; font-size: 20px;" id="number">Buyer Number</div>
+                <div style="font-family: 'Courier New', Courier, monospace; font-size: 20px;" id="email">holderemail@gmail.com</div>
+                <div style="font-family: 'Courier New', Courier, monospace; font-size: 20px;" class="venue"> Akroma Plaza</div>
+            
+        </div>
+        <div class="info">
+            <p id="purch">Purchased</p>
+        </div>
+        <p id="tictype">R</p>
+
+</div>
+    <div id="payment-info"></div>
+<h1 id="error" style="color: rgb(0, 0, 0);">Error Code</h1>
+</body>
+<script src="crypto-js.js"></script>
+<script src="qrcode.min.js"></script>
+<script src="paystack.js"></script>
+<script type="module" src="index.js"></script>
+</html>
