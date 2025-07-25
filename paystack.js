@@ -1,123 +1,231 @@
-//Global Declarations
-const name_on_ticket = document.getElementById('name')
-const buyer_email = document.getElementById('email')
-const buyer_number = document.getElementById('number')
-const para = document.getElementById('code');
-const purch = document.getElementById('purch')
-const QRspace = document.getElementById("qrcode");
-const qr = document.createElement('div'); qr.className = "qr"; QRspace.appendChild(qr);
+// ── POPUP SETUP ─────────────────────────────────────────────
+const popup        = document.getElementById('popup');
+const popupIcon    = document.getElementById('popup-icon');
+const popupMessage = document.getElementById('popup-message');
 
-// Function to verify payment reference
-function verifyPayment(reference) {
-const paystackSecretKey = 'sk_test_65b426e3ed57bad58395a500bf68f17cf50e3df4'; // Replace with your Paystack secret key
-const url = `https://api.paystack.co/transaction/verify/${encodeURIComponent(reference)}`;
-//Fetch Transaction Data
-fetch(url, {
-  method: 'GET',
-  headers: {
-  Authorization: `Bearer ${paystackSecretKey}`,
-  },
-  })
- .then((response) => response.json())//Convert Response into JSON
- //Recieving and parsing data
- .then((data) => {//Get data from JSON
-    const paymentInfo = document.getElementById('payment-info');//Declaration of space to display payment info
-    //If trasaction id returns data
-    if (data.status === true) {//Take action
-      const paymentData = data.data;//Assigning data to local scoped variable
-      const time = new Date(paymentData.paidAt)
-      function generateticketCode(){//Generate Unique Ticket Code
-        const ticketCode = 'BM - ' + (parseFloat(paymentData.id+paymentData.reference)).toString().slice(-6);
-       ticketCode;
-        const path =  (paymentData.customer.first_name + ' ' + paymentData.customer.last_name) + "'s ticket ID " + ((parseFloat(paymentData.id+paymentData.reference)).toString().slice(-6))
-        para.textContent = ticketCode;
-        addDataToDatabase(path , DBdata);
-        //Testing variables
-        console.log(info.key)
-        console.log(encryptedCode);
-        console.log(CryptoJS.AES.decrypt(encryptedCode,secrekey).toString(CryptoJS.enc.Utf8));
-        return encryptedCode;
-      }
-       const info = {
-        key: 'BM - ' + (parseFloat(paymentData.id+paymentData.reference)).toString().slice(-6),
-        name: paymentData.customer.first_name + ' ' + paymentData.customer.last_name,
-        number: paymentData.customer.phone,
-        email: paymentData.customer.email
-      };
-      const DBdata = {//Database Declaration
-        code: code = info
-      }
-      const secrekey = "Made_By_BM";
-      const key = JSON.stringify(info) ;
-      const encryptedCode = CryptoJS.AES.encrypt(key, secrekey).toString()
-     
-      //Generate QR Code
-      function generateQR (arg) {
-        while(qr.firstChild){
-          qr.removeChild(qr.firstChild)
-        }
-        //QR Code Values
-        var qrcode = new QRCode(qr,{
-          width: 200,
-          height: 200,
-          colorDark: 'black',
-          colorLight: '#ffffff',
-          correctLevel: QRCode.CorrectLevel.H})
-        qrcode.makeCode(arg)
-        };
-      //Assignements
-      name_on_ticket.textContent = (paymentData.customer.first_name + ' ' + paymentData.customer.last_name)
-      buyer_email.textContent = paymentData.customer.email;
-      buyer_number.textContent = "+233 " + paymentData.customer.phone.toString().slice(1,4) +' '+ paymentData.customer.phone.toString().slice(4,7) +' ' + paymentData.customer.phone.toString().slice(7,10);
-      purch.textContent = 'Purchased at ' + time.toLocaleString();
-      const tictype = document.getElementById('tictype')
-      if((paymentData.amount / 100).toFixed(2) == 200){
-        tictype.textContent = "V.I.P"
-        tictype.style.transform = "scaleX(2)"
-        tictype.style.transform = "scaleY(1)"
-      }else if((paymentData.amount / 100).toFixed(2) == 100){
-        tictype.textContent = "REGULAR"
-      }
-      //Displaying Payment Info On Screen
-      paymentInfo.innerHTML = `
-        <p>Customer Name: ${paymentData.customer.first_name} ${paymentData.customer.last_name}</p>
-        <p>Customer Email: ${paymentData.customer.email}</p>
-        <p>Payment Amount: ₵${(paymentData.amount / 100).toFixed(2)}</p>
-        <p>Payment Number: ${paymentData.customer.phone}<p>
-        <p>Payment Refrence: ${paymentData.reference}<p>
-        <p>Payment ID: ${paymentData.id}<p>
-        <p>Payment Time: ${time.toString()}<p>
-      `;
-      //Running...
-      generateQR(generateticketCode());
-      }else {//Return error if no data is found in response
-        alert('Payment not found or invalid reference');
-      }
-  })
-  .catch((error) => {
-    alert(error.message);
-  });
+function showPopup(state, message) {
+  popupIcon.className      = `popup-icon ${state}`;
+  popupMessage.textContent = message;
+  popup.style.display      = 'flex';
+  popup.style.flexDirection= 'column';
+
+  if (state !== 'load') {
+    setTimeout(() => { popup.style.display = 'none'; }, 2000);
+  }
 }
+// ────────────────────────────────────────────────────────────
 
-function addDataToDatabase(path, data) {
-  dbRef = ref(db, path);//adds only one refrence(ticket)
-  get(dbRef).then((snapshot) => {
-    if (snapshot.exists()) {
-      alert('Data already exists!');
-    } else {
-      set(dbRef, data);
-      alert('data added to database')
+
+// ── ELEMENT REFERENCES ──────────────────────────────────────
+const nameOnTicket  = document.getElementById('name');
+const buyerEmail    = document.getElementById('email');
+const buyerNumber   = document.getElementById('number');
+const codePara      = document.getElementById('code');
+const ticketBox     = document.getElementById('ticketBox');
+const purchaseInfo  = document.getElementById('purch');
+const paymentInfoEl = document.getElementById('payment-info');
+const qrContainer   = document.createElement('div');
+qrContainer.className = 'qr';
+document.getElementById('qrcode').appendChild(qrContainer);
+
+const generateBtn   = document.getElementById('generate-ticket');
+const downloadPngBtn= document.getElementById('download-ticket');
+const downloadPdfBtn= document.getElementById('download-pdf');
+// ────────────────────────────────────────────────────────────
+
+
+// ── PAYMENT VERIFICATION & TICKET CREATION ─────────────────
+async function verifyPayment(reference) {
+  showPopup('load', 'Verifying payment…');
+
+  const secretKey = 'sk_test_65b426e3ed57bad58395a500bf68f17cf50e3df4';
+  const url = `https://api.paystack.co/transaction/verify/${encodeURIComponent(reference)}`;
+
+  try {
+    const res  = await fetch(url, {
+      method: 'GET',
+      headers: { Authorization: `Bearer ${secretKey}` }
+    });
+    const json = await res.json();
+
+    if (!json.status) {
+      showPopup('error', 'Verification failed');
+      return;
     }
-  }).catch((error) => {
-    alert('Error checking data:', error.message);
+
+    showPopup('success', 'Payment verified');
+    const data     = json.data;
+    const paidAt   = new Date(data.paidAt);
+    const fullName = `${data.metadata.custom_fields[0].value} ${data.metadata.custom_fields[1].value}`;
+    const phone    = data.metadata.custom_fields[2].value;
+    const payref = data.reference.toString().slice(6)
+    console.log(payref)
+    const ticketID = `BM - ${(parseFloat((Number(data.id) +Number( payref)))).toString().slice(-6)}`;
+    const info     = {
+      key:    ticketID,
+      name:   fullName,
+      number: phone,
+      email:  data.customer.email
+    };
+
+    // display code & UI
+    codePara.textContent   = ticketID;
+    nameOnTicket.textContent = info.name;
+    buyerEmail.textContent   = info.email;
+    buyerNumber.textContent  = formatGhanaPhone(info.number);
+    purchaseInfo.textContent = `Purchased at ${paidAt.toLocaleString()}`;
+    setTicketTypeStyle(data.amount);
+    displayPaymentDetails(data, paidAt);
+
+    // encrypt & store ticket
+    const secret     = 'Made_By_BM';
+    const encrypted  = CryptoJS.AES.encrypt(JSON.stringify(info), secret).toString();
+    const dbPath     = `Unused/${info.name}'s ticket ID ${ticketID.slice(-6)}`;
+    addDataToDatabase(dbPath, { code: info });
+
+    // generate QR with encrypted payload
+    generateQR(encrypted);
+
+  } catch (err) {
+    console.error(err);
+    showPopup('error', 'Network or server error');
+  }
+}
+
+// format Ghana phone as +233 XXX XXX XXX
+function formatGhanaPhone(raw) {
+  const cleaned = raw.replace(/\D/g, '');
+  return `+233 ${cleaned.slice(1,4)} ${cleaned.slice(4,7)} ${cleaned.slice(7,10)}`;
+}
+
+// set ticket background & label based on amount
+function setTicketTypeStyle(amountInCedi) {
+  const price = (amountInCedi / 100).toFixed(2);
+  const tLabel = document.getElementById('tictype');
+
+  if (+price === 200) {
+    tLabel.textContent = 'V.I.P';
+    document.getElementById('style').href = 'style.css';
+    ticketBox.style.backgroundImage = 'url("Layer 2.png")';
+  } else {
+    tLabel.textContent = 'REGULAR';
+    document.getElementById('style').href = 'regular.css';
+    ticketBox.style.backgroundImage = 'url("Prism Overlays 7 copy.png")';
+  }
+}
+
+// fill in detailed payment info section
+function displayPaymentDetails(data, dateObj) {
+  paymentInfoEl.innerHTML = `
+    <p>Customer Name: ${data.customer.first_name} ${data.customer.last_name}</p>
+    <p>Customer Email: ${data.customer.email}</p>
+    <p>Payment Amount: ₵${(data.amount / 100).toFixed(2)}</p>
+    <p>Payment Number: ${data.customer.phone}</p>
+    <p>Payment Reference: ${data.reference}</p>
+    <p>Payment ID: ${data.id}</p>
+    <p>Payment Time: ${dateObj.toString()}</p>
+  `;
+}
+
+// generate QR code into qrContainer
+function generateQR(payload) {
+  // clear container
+  qrContainer.innerHTML = '';
+
+  const qr = new QRCode(qrContainer, {
+    width: 170,
+    height: 170,
+    colorDark: 'black',
+    colorLight: '#ffffff',
+    correctLevel: QRCode.CorrectLevel.H
+  });
+  qr.makeCode(payload);
+}
+
+// ── DATABASE HELPERS ────────────────────────────────────────
+function addDataToDatabase(path, data) {
+  const dbRef = ref(db, path);
+  get(dbRef)
+    .then(snapshot => {
+      if (snapshot.exists()) {
+
+      } else {
+        set(dbRef, data)
+          .then(() => showPopup('success', 'Ticket saved'))
+          .catch(() => showPopup('error', 'Save failed'));
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      showPopup('error', 'DB check failed');
+    });
+}
+// ────────────────────────────────────────────────────────────
+
+
+// ── DOWNLOAD HELPERS ────────────────────────────────────────
+function createSnapshotWrapper(element) {
+  const wrapper = document.createElement('div');
+  const styles  = getComputedStyle(document.body);
+  wrapper.style.background       = styles.background;
+  wrapper.style.padding          = '30px';
+  wrapper.style.display          = 'flex';
+  wrapper.style.justifyContent   = 'center';
+  wrapper.style.alignItems       = 'center';
+  wrapper.style.position         = 'absolute';
+  wrapper.style.top              = '-9999px';
+
+  const clone = element.cloneNode(true);
+  wrapper.appendChild(clone);
+  document.body.appendChild(wrapper);
+  return wrapper;
+}
+
+function downloadAsPNG() {
+  showPopup('load', 'Preparing download…');
+  const wrapper = createSnapshotWrapper(ticketBox);
+
+  html2canvas(wrapper, { scale: 2 }).then(canvas => {
+    const link = document.createElement('a');
+    link.href    = canvas.toDataURL('image/png');
+    link.download= 'ticket.png';
+    link.click();
+    document.body.removeChild(wrapper);
+    showPopup('success', 'Downloaded!');
   });
 }
 
+function downloadAsPDF() {
+  showPopup('load', 'Preparing download…');
+  const wrapper = createSnapshotWrapper(ticketBox);
 
-// Event listener for generate ticket button
-document.getElementById('generate-ticket').addEventListener('click', () => {
-  const reference = document.getElementById('ref').value;
-  console.log(reference)
-  verifyPayment(reference);  
+  html2canvas(wrapper, { scale: 2 }).then(canvas => {
+    const imgData = canvas.toDataURL('image/png');
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({
+      orientation: canvas.width > canvas.height ? 'landscape' : 'portrait',
+      unit: 'px',
+      format: [canvas.width, canvas.height]
+    });
+    pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+    pdf.save('ticket.pdf');
+    document.body.removeChild(wrapper);
+    showPopup('success', 'Downloaded!');
+  });
+}
+// ────────────────────────────────────────────────────────────
+
+
+// ── EVENT LISTENERS ────────────────────────────────────────
+generateBtn.addEventListener('click', () => {
+  const refVal = document.getElementById('ref').value.trim();
+  if (!refVal) {
+    showPopup('error', 'Please enter reference');
+    return;
+  }
+  verifyPayment(refVal);
 });
 
+downloadPngBtn.addEventListener('click', downloadAsPNG);
+downloadPdfBtn.addEventListener('click', downloadAsPDF);
+// ────────────────────────────────────────────────────────────

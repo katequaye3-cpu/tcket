@@ -1,14 +1,13 @@
-:root{
-  --bg-primary: #121217;
-  --bg-secondary: #1e1e2a;
-  --accent-gold: #dab756;
-  --accent-light: #f0d775;
-  --text-light: #ce9908;
-  --text-mid: goldenrod;
-  --text-dark: #444;
-  --shadow-md: rgba(0, 0, 0, 0.5);
+:root {
+  --bg-primary: #f4f4f4;
+  --bg-secondary: #e9e9e9;
+  --accent-gold: #bbb;
+  --accent-light: #ddd;
+  --text-light: #222;
+  --text-mid: #555;
+  --text-dark: #484848;
+  --shadow-md: rgba(0, 0, 0, 0.1);
 }
-
 
 /* ── FONTS ───────────────────────────────── */
 @font-face { font-family: 'Radjhani_L'; src: url('./Font_Faces/Rajdhani-Light.ttf'); }
@@ -26,7 +25,7 @@ body {
   margin: 0;
   padding: 0;
   font-family: 'Radjhani', sans-serif;
-  background: linear-gradient(135deg, var(--bg-primary), var(--bg-secondary));
+  background: var(--bg-primary);
   color: var(--text-light);
   display: flex;
   flex-direction: column;
@@ -39,8 +38,8 @@ body {
   justify-content: space-between;
   align-items: flex-start;
   padding: 2rem 3rem;
-  background: linear-gradient(90deg, var(--bg-secondary), var(--bg-primary));
-  box-shadow: 0 4px 12px var(--shadow-md);
+  background: var(--bg-secondary);
+  box-shadow: 0 2px 6px var(--shadow-md);
 }
 
 .control_left {
@@ -53,9 +52,7 @@ body {
   font-style: italic;
   font-size: clamp(2rem, 5vw, 3rem);
   line-height: 1.2;
-  background: linear-gradient(90deg, var(--accent-gold), var(--accent-light));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--text-dark);
 }
 
 .control_right {
@@ -67,24 +64,24 @@ body {
 .control_right input#ref {
   font-family: monospace;
   padding: 0.6rem 1rem;
-  background: var(--bg-primary);
-  border: 1px solid var(--text-dark);
+  background: #fff;
+  border: 1px solid var(--accent-gold);
   border-radius: 0.5rem;
   color: var(--text-light);
 }
 
 .control_right button {
   padding: 0.6rem 1.5rem;
-  background: var(--accent-gold);
-  border: 1px solid var(--accent-light);
+  background: var(--accent-light);
+  border: 1px solid var(--accent-gold);
   border-radius: 0.5rem;
   font-family: 'Radjhani_B';
   font-size: 1rem;
-  color: var(--bg-secondary);
+  color: var(--text-dark);
   cursor: pointer;
 }
 .control_right button:hover {
-  background: var(--accent-light);
+  background: var(--accent-gold);
   color: var(--bg-primary);
 }
 
@@ -95,36 +92,7 @@ body {
   justify-content: center;
   align-items: center;
   padding: 2rem;
-}
-
-@keyframes goldAnim {
-  0%   { background-position:   0% 0%; }
-  25%  { background-position: 25% 50%; }
-  50%  { background-position: 50% 80%; }
-  75% { background-position:   75% 50%; }
-  100% { background-position:   0% 0%; }
-}
-
-@keyframes holoAnim {
- 0%{
-  box-shadow: 0 0 10px rgba(255,183,0,0.2);
- }
- 20%{
-  box-shadow: 0 0 20px rgba(255,183,0,0.4);
- }
- 40%{
-  box-shadow: 0 0 30px rgba(255,183,0,0.6);
- }
- 60%{
-  box-shadow: 0 0 30px rgba(255,183,0,0.6);
- }
- 80%{
-
-  box-shadow: 0 0 20px rgba(255,183,0,0.4);
- }
- 100%{
-  box-shadow: 0 0 10px rgba(255,183,0,0.2);
- }
+  background: var(--bg-primary);
 }
 
 /* ── TICKET CARD ─────────────────────────── */
@@ -132,26 +100,15 @@ body {
   width: 100%;
   max-width: 480px;
   aspect-ratio: 1 / 1;
-  background: radial-gradient(circle at top left, var(--bg-secondary), var(--bg-primary));
-  border: 2px solid var(--accent-gold);
+  background: var(--bg-secondary);
+  border: 1px solid var(--accent-gold);
   border-radius: 1rem;
-  box-shadow:
-    0 8px 20px rgba(0,0,0,0.7),
-    inset 0 2px 6px rgba(255,255,255,0.1);
+  box-shadow: 0 4px 10px var(--shadow-md);
   display: flex;
-  animation: holoAnim 3s infinite, goldAnim 80s linear infinite;
   flex-direction: column;
   align-items: center;
   padding: 1.5rem;
 }
-
-.ticket{
-  background: transparent;
-  width: 100%;
-  max-width: 500px;
-  aspect-ratio: 1 / 1;
-}
-
 
 /* ── QR FRAME ────────────────────────────── */
 .qrContainer {
@@ -162,27 +119,20 @@ body {
   align-items: center;
   justify-content: center;
   background-color: transparent;
-  border-radius: 20px;
-}
-.qrContainer::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 2;
+  border-radius: 12px;
 }
 
 #qrcode {
   width: 200px;
   height: 200px;
   background-color: #fff;
-  z-index: 1;
-  border: #dab756;
+  border: 1px solid var(--accent-gold);
   border-radius: 1rem;
   display: flex;
   align-items: center;
   justify-content: center;
 }
+
 #qrcode canvas {
   width: 100% !important;
   height: 100% !important;
@@ -192,11 +142,11 @@ body {
 /* ── DIVIDER LINE ────────────────────────── */
 hr.divider {
   width: 80%;
-  height: 2px;
-  background: var(--text-dark);
+  height: 1px;
+  background: var(--accent-gold);
   border: none;
   margin: 1rem 0;
-  opacity: 0.4;
+  opacity: 0.3;
 }
 
 /* ── TICKET INFO ─────────────────────────── */
@@ -229,26 +179,33 @@ hr.divider {
   margin: 0.25rem 0;
 }
 
-/* ── EXTRUDED TICKET TYPE ───────────────── */
+/* ── TICKET TYPE ─────────────────────────── */
 #tictype {
   font-family: 'Radjhani_B';
   font-size: clamp(2.4rem,7vw,3.2rem);
   margin-top: 1rem;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  text-shadow:
-    2px 2px 0 var(--accent-light),
-    4px 4px 6px rgba(0,0,0,0.6);
+  color: var(--text-dark);
+  text-shadow: none;
 }
 
 /* ── PURCHASE INFO ───────────────────────── */
 .Info_Space p#purch {
   font-size: 0.9rem;
-  color: var(--text-light);
+  color: var(--text-mid);
   margin-top: 0.75rem;
 }
 
+@keyframes goldAnim {
+  0%   { background-position:   0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position:   0% 50%; }
+}
 
+@keyframes holoAnim {
+  0%   { background-position:   0%   0%; }
+  50%  { background-position: 100% 100%; }
+  100% { background-position:   0%   0%; }
+}
 
 /* ── RESPONSIVE TWEAKS ───────────────────── */
 @media (max-width: 768px) {
@@ -257,14 +214,17 @@ hr.divider {
     align-items: center;
     gap: 1.5rem;
   }
+
   #ticketBox {
     max-width: 90%;
     padding: 1rem;
   }
+
   .qrContainer, #qrcode {
     width: 200px;
     height: 200px;
   }
+
   #tictype {
     font-size: clamp(1.8rem,8vw,2.8rem);
   }
@@ -273,11 +233,10 @@ hr.divider {
   font-family: 'Radjhani_SB';
   font-size: clamp(2rem,4vw,1.6rem);
   margin: 0%;
-  margin-top:10px;
+  margin-top: 10px;
   font-style: italic;
   color: var(--text-light);
 }
-
 
 .control_right {
   display: flex;
@@ -286,7 +245,6 @@ hr.divider {
   align-items: center;
 }
 }
-
 
 /* ── POPUP STYLES ───────────────────────── */
 .popup {
@@ -328,7 +286,7 @@ hr.divider {
 
 /* success state */
 .popup-icon.success {
-  color: chartreuse;
+  color:chartreuse;
   animation: pop 0.4s ease-out both;
 }
 .popup-icon.success::before { content: "✔"; }
@@ -356,4 +314,3 @@ hr.divider {
   0% { transform: scale(0.5); opacity: 0; }
   100% { transform: scale(1); opacity: 1; }
 }
-
