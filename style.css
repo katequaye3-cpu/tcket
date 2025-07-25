@@ -328,7 +328,7 @@ hr.divider {
 
 /* success state */
 .popup-icon.success {
-  color: chartreuse;
+  color: rgb(255, 245, 47);
   animation: pop 0.4s ease-out both;
 }
 .popup-icon.success::before { content: "✔"; }
