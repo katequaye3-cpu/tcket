@@ -164,55 +164,109 @@ function addDataToDatabase(path, data) {
 
 
 // ── DOWNLOAD HELPERS ────────────────────────────────────────
-function createSnapshotWrapper(element) {
-  const wrapper = document.createElement('div');
-  const styles  = getComputedStyle(document.body);
-  wrapper.style.background       = styles.background;
-  wrapper.style.padding          = '30px';
-  wrapper.style.display          = 'flex';
-  wrapper.style.justifyContent   = 'center';
-  wrapper.style.alignItems       = 'center';
-  wrapper.style.position         = 'absolute';
-  wrapper.style.top              = '-9999px';
+// 0) Global to keep last QR data
+let lastEncryptedCode = '';
 
-  const clone = element.cloneNode(true);
-  wrapper.appendChild(clone);
+// 1) Update your generateQR helper:
+function generateQR(arg) {
+  lastEncryptedCode = arg;                // store for later
+  qr.innerHTML = '';                      // clear old
+  new QRCode(qr, {                        // draw into original
+    width: 170,
+    height: 170,
+    colorDark: 'black',
+    colorLight: '#ffffff',
+    correctLevel: QRCode.CorrectLevel.H
+  }).makeCode(arg);
+}
+
+// 2) Helper: wrap & clone ticketBox
+function createSnapshotWrapper() {
+  const wrapper = document.createElement('div');
+  Object.assign(wrapper.style, {
+    background:    'transparent',
+    padding:       '30px',
+    display:       'flex',
+    justifyContent:'center',
+    alignItems:    'center',
+    position:      'absolute',
+    top:           '-9999px',
+    left:          '-9999px'
+  });
   document.body.appendChild(wrapper);
+
+  const clone = ticketBox.cloneNode(true);
+  // hide leftover overlays if you use them
+  const styleOverride = document.createElement('style');
+  styleOverride.textContent = `
+     .over, #loader, #success, #error { display: none !important; }
+     * { animation: none !important; }
+  `;
+  clone.insertBefore(styleOverride, clone.firstChild);
+
+  wrapper.appendChild(clone);
   return wrapper;
 }
 
-function downloadAsPNG() {
+// 3) Download as PNG
+downloadPngBtn.addEventListener('click', () => {
   showPopup('load', 'Preparing download…');
-  const wrapper = createSnapshotWrapper(ticketBox);
+  const wrapper = createSnapshotWrapper();
 
-  html2canvas(wrapper, { scale: 2 }).then(canvas => {
-    const link = document.createElement('a');
-    link.href    = canvas.toDataURL('image/png');
-    link.download= 'ticket.png';
-    link.click();
-    document.body.removeChild(wrapper);
-    showPopup('success', 'Downloaded!');
-  });
-}
+  // re-generate QR on the clone
+  const cloneQR = wrapper.querySelector('.qr');
+  if (cloneQR && lastEncryptedCode) {
+    cloneQR.innerHTML = '';
+    new QRCode(cloneQR, {
+      width: 170, height: 170,
+      colorDark: 'black', colorLight: '#fff',
+      correctLevel: QRCode.CorrectLevel.H
+    }).makeCode(lastEncryptedCode);
+  }
 
-function downloadAsPDF() {
-  showPopup('load', 'Preparing download…');
-  const wrapper = createSnapshotWrapper(ticketBox);
-
-  html2canvas(wrapper, { scale: 2 }).then(canvas => {
-    const imgData = canvas.toDataURL('image/png');
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF({
-      orientation: canvas.width > canvas.height ? 'landscape' : 'portrait',
-      unit: 'px',
-      format: [canvas.width, canvas.height]
+  html2canvas(wrapper, { scale: 2, backgroundColor: null })
+    .then(canvas => {
+      const link = document.createElement('a');
+      link.href        = canvas.toDataURL('image/png');
+      link.download    = 'ticket.png';
+      link.click();
+      document.body.removeChild(wrapper);
+      showPopup('success', 'Downloaded!');
     });
-    pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
-    pdf.save('ticket.pdf');
-    document.body.removeChild(wrapper);
-    showPopup('success', 'Downloaded!');
-  });
-}
+});
+
+// 4) Download as PDF
+downloadPdfBtn.addEventListener('click', () => {
+  showPopup('load', 'Preparing download…');
+  const wrapper = createSnapshotWrapper();
+
+  // re-generate QR on the clone
+  const cloneQR = wrapper.querySelector('.qr');
+  if (cloneQR && lastEncryptedCode) {
+    cloneQR.innerHTML = '';
+    new QRCode(cloneQR, {
+      width: 170, height: 170,
+      colorDark: 'black', colorLight: '#fff',
+      correctLevel: QRCode.CorrectLevel.H
+    }).makeCode(lastEncryptedCode);
+  }
+
+  html2canvas(wrapper, { scale: 2, backgroundColor: null })
+    .then(canvas => {
+      const imgData = canvas.toDataURL('image/png');
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF({
+        orientation: canvas.width > canvas.height ? 'landscape' : 'portrait',
+        unit: 'px',
+        format: [canvas.width, canvas.height]
+      });
+      pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+      pdf.save('ticket.pdf');
+      document.body.removeChild(wrapper);
+      showPopup('success', 'Downloaded!');
+    });
+});
+
 // ────────────────────────────────────────────────────────────
 
 
